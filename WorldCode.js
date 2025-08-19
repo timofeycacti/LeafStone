@@ -1,8 +1,25 @@
-//By timofeycacti on Github!
-let RBlocks=[]; 
+//By cvetochekcactus on Github!
+let RBlocks=[];
+let lb=[] //litten up blocks
 
-function bget(x,y,z){ //simplifying the function
+function bget(x,y,z){
   return api.getBlock(x,y,z);
+}
+
+
+function tick(){
+if (lb.length>0){ // checking if there are bugged blocks
+	let [xx,yy,zz] = lb.shift(); //getting and deleting the first item
+	let matrix=[[-1,0],[0,-1],[0,1],[1,0]]	//creating matrix
+	for (let b of matrix){
+    if (bget(xx+b[0],yy,zz+b[1]) == "Dirt") { //doing almost the same as in the Light function, but without lighting the near blocks up
+      api.setBlock(xx+b[0],yy,zz+b[1],"Grass Block");
+    } else if (bget(xx+b[0],yy,zz+b[1]) == "Grass Block") {
+      api.setBlock(xx+b[0],yy,zz+b[1],"Dirt");
+	}
+	}
+	api.setBlock(xx,yy,zz,"Maple Leaves")
+}
 }
 
 function Light(x,y,z){
@@ -10,12 +27,13 @@ function Light(x,y,z){
   let RBlocks=[];
   while (DRA.length > 0) {
     let [xx,yy,zz] = DRA.shift();
-	let matrix=[[-1,0],[0,-1],[0,1],[1,0]]	//Relative cords, show the program, where to check the blocks
+	let matrix=[[-1,0],[0,-1],[0,1],[1,0]]	
 	for (let b of matrix){
     if (bget(xx+b[0],yy,zz+b[1]) == "Maple Leaves") {
       DRA.push([xx+b[0],yy,zz+b[1]]);
       RBlocks.push([xx+b[0],yy,zz+b[1]]);
 	  api.setBlock([xx+b[0],yy,zz+b[1]],"Fruity Maple Leaves")
+	  lb.push([xx+b[0],yy,zz+b[1]])
     } else if (bget(xx+b[0],yy,zz+b[1]) == "Dirt") {
       api.setBlock(xx+b[0],yy,zz+b[1],"Grass Block");
     } else if (bget(xx+b[0],yy,zz+b[1]) == "Grass Block") {
@@ -25,6 +43,7 @@ function Light(x,y,z){
 }
 
 for (let i of RBlocks){
+lb.pop(lb.indexOf(i))
 api.setBlock(i,"Maple Leaves")
 }
 
@@ -45,3 +64,15 @@ api.giveItem(id,"Maple Wood Planks",999,{customDisplayName:"Lever"})
 api.giveItem(id,"Dirt",999,{customDisplayName:"Lamp"})
 api.sendMessage(id,"Welcome to the Leafstone Beta by cvetochekcactus!\n P.S. Activate the lever by RMBing it!")
 }
+
+function playerCommand(id,cmd){
+
+if (cmd == "bugged"){
+api.log(lb)
+}
+
+}
+
+
+
+
